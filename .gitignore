@@ -1,0 +1,16 @@
+.Rhistory
+.RData
+.Ruserdata
+.Rproj.user/
+
+# renv
+renv/library/
+renv/staging/
+renv/sandbox/
+
+rsconnect/
+.env
+.Renviron
+
+.DS_Store
+Thumbs.db
