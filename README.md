@@ -8,10 +8,10 @@ A modular R Shiny application for dengue outbreak monitoring across all 17 Phili
 
 ## Features
 
-- Regional risk map: interactive Leaflet map showing case counts and incidence rates per 100,000 population across all regions, with risk classification (Low / Medium / High)
-- Trend dashboard: yearly national and per-region time series overlaying dengue cases with a rainfall index
-- Risk prediction: 1–3 year forward forecast using a lagged regression model with 95% prediction intervals
-- Key metrics: KPI cards summarising year-on-year growth, peak year, and cumulative national burden
+- *Regional risk map:* interactive Leaflet map showing case counts and incidence rates per 100,000 population across all regions, with risk classification (Low / Medium / High)
+- *Trend dashboard:* yearly national and per-region time series overlaying dengue cases with a rainfall index
+- *Risk prediction:* 1–3 year forward forecast using a lagged regression model with 95% prediction intervals
+- *Key metrics:* KPI cards summarising year-on-year growth, peak year, and cumulative national burden
 
 ## Modeling Approach
 
@@ -23,11 +23,11 @@ $$
 
 Where:
 
-- $\hat{y}_t$ — predicted dengue cases at year $t$
-- $x_{1,\, t-1}$ — rainfall index lagged by one year
-- $x_{2,\, t}$ — temperature anomaly (°C) at year $t$
-- $\beta_0, \beta_1, \beta_2$ — estimated coefficients
-- $\varepsilon_t$ — error term
+- $\hat{y}_t$: predicted dengue cases at year $t$
+- $x_{1,\, t-1}$: rainfall index lagged by one year
+- $x_{2,\, t}$: temperature anomaly (°C) at year $t$
+- $\beta_0, \beta_1, \beta_2$: estimated coefficients
+- $\varepsilon_t$: error term
 
 The one-year lag on rainfall reflects the biological lifecycle of *Aedes aegypti*: elevated rainfall expands breeding sites, and the resulting increase in mosquito density translates into elevated case counts in the following transmission season. Temperature anomaly is included as a concurrent predictor, as warmer conditions accelerate both mosquito development and viral replication.
 
@@ -43,10 +43,10 @@ This app is deployed to [shinyapps.io](https://www.shinyapps.io) via GitHub Acti
 | Secret | Description |
 |---|---|
 | `SHINYAPPS_ACCOUNT` | shinyapps.io username |
-| `SHINYAPPS_TOKEN` | Token from Account → Tokens |
-| `SHINYAPPS_SECRET` | Secret from Account → Tokens |
+| `SHINYAPPS_TOKEN` | Token from Account (Tokens) |
+| `SHINYAPPS_SECRET` | Secret from Account (Tokens) |
 
-See `.github/workflows/deploy.yml` for the full workflow.
+[See the full workflow](https://github.com/joshuamarie/dengue-monitoring/blob/main/.github/workflows/deploy-shiny.yml).
 
 ## Upgrading to Real Data
 
