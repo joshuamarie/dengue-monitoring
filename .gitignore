@@ -2,6 +2,7 @@
 .RData
 .Ruserdata
 .Rproj.user/
+^*.Rproj
 
 # renv
 renv/library/
