@@ -15,3 +15,5 @@ rsconnect/
 
 .DS_Store
 Thumbs.db
+
+*.html
