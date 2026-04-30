@@ -1,5 +1,7 @@
 box::use(
     dplyr[lag, filter, mutate, group_by, summarise, arrange, desc, pull, tibble],
+    stats[rnorm, lm, predict],
+    utils[tail]
 )
 
 # Fit lagged regression on national yearly data
