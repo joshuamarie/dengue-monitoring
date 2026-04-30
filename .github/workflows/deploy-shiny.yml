@@ -51,7 +51,7 @@ jobs:
             )
             rsconnect::deployApp(
                 appDir = ".",
-                appName = "dengue-surveillance-ph",
+                appName = "dengue-surveillance",
                 forceUpdate = TRUE
             )
         shell: Rscript {0}
