@@ -18,7 +18,7 @@ A modular R Shiny application for dengue outbreak monitoring across all 17 Phili
 A lagged ordinary least squares regression model is fitted on the national yearly time series:
 
 $$
-\hat{y}_t = \beta_0 + \beta_1 x_{1,\, t-1} + \beta_2 x_{2,\, t} + \varepsilon_t
+\hat{y}_t = \beta_0 + \beta_1 x_{1,\ t-1} + \beta_2 x_{2,\ t} + \varepsilon_t
 $$
 
 Where:
