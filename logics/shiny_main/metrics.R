@@ -13,7 +13,7 @@ metrics_ui = function(id) {
     tagList(
         div(
             class = "module-header",
-            h4("Key Epidemiological Metrics"),
+            h4("Epidemiological Metrics"),
             p("National summary across all years", class = "module-subtitle")
         ),
         uiOutput(ns("kpi_row")),
