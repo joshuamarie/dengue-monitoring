@@ -97,7 +97,6 @@ ui = fluidPage(
 )
 
 server = function(input, output, session) {
-
     national_ts = reactive({
         SIM_DATA$national
     })
@@ -106,10 +105,15 @@ server = function(input, output, session) {
         SIM_DATA$regional
     })
 
-    # Wire up modules
+    # ---- Server modules wire ups ----
+
+    ## ---- "Map" server ----
     map$map_server("map", region_ts = region_ts)
+    ## ---- "Trends server ----
     trends$trends_server("trends", national_ts = national_ts, region_ts = region_ts)
+    ## ---- "Risk" server ----
     risk$risk_server("risk", national_ts = national_ts)
+    ## ---- "Metrics" server ----
     metrics$metrics_server("metrics", national_ts = national_ts, region_ts = region_ts)
 }
 
