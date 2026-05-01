@@ -3,8 +3,10 @@ box::use(
     stats[rnorm]
 )
 
-# Region reference table
-# Approximate centroids, populations (2020 PSA estimates), and climate profile
+#' Region reference table
+#'
+#' A table in `tibble` format that approximates centroids,
+#' populations (2020 PSA estimates), and climate profile
 REGIONS = tibble(
     region_code = c(
         "NCR", "CAR", "I", "II", "III",
@@ -46,7 +48,6 @@ REGIONS = tibble(
     )
 )
 
-# Yearly national-level simulation
 simulate_dengue_data =
     function(
         start_year = 2018,
@@ -60,16 +61,14 @@ simulate_dengue_data =
         n_years = length(years)
         n_regions = nrow(REGIONS)
 
-        # National yearly rainfall index (relative, normalised around 1)
-        # 2019 and 2022 were notably high dengue years in the Philippines
+        # National summary:
+        # 1. Total cases
+        # 2. Rainfall index
+        # 3. Temperature anomaly
         national_rain_index = c(1.00, 1.30, 0.85, 0.90, 1.20, 1.10, 0.95, 1.05)
         national_rain_index = national_rain_index[seq_len(n_years)]
-
-        # National yearly temperature anomaly (degrees C above baseline)
         temp_anomaly = c(0.0, 0.3, -0.1, 0.2, 0.4, 0.3, 0.1, 0.2)
         temp_anomaly = temp_anomaly[seq_len(n_years)]
-
-        # National summary: total cases, rainfall index, temperature anomaly
         national_ts = tibble(
             year = years,
             rainfall_index = round(national_rain_index + rnorm(n_years, 0, 0.05), 3),
@@ -78,7 +77,7 @@ simulate_dengue_data =
                 pmax(
                     0,
                     round(
-                        80000 *
+                        70000 *
                             national_rain_index *
                             (1 + 0.15 * temp_anomaly) +
                             rnorm(n_years, 0, 5000)
@@ -87,16 +86,19 @@ simulate_dengue_data =
             )
         )
 
-        # Region-year breakdown
+        # Per year region breakdown
         region_rows = lapply(seq_len(n_years), function(i) {
             yr = years[i]
             rain_idx = national_ts$rainfall_index[i]
             temp_anom = national_ts$temp_anomaly_c[i]
 
-            # Cases per region: scaled by population, endemic index, and national climate signal
+            # Cases per region
+            # 1. Scaled by population
+            # 2. Endemic index
+            # 3. National climate signal
             pop_wt = REGIONS$population / sum(REGIONS$population)
             base = national_ts$cases[i] * pop_wt * REGIONS$endemic_index
-            base = base / mean(REGIONS$endemic_index)  # re-normalise so total stays consistent
+            base = base / mean(REGIONS$endemic_index)
 
             regional_cases = pmax(0, round(base + rnorm(n_regions, 0, base * 0.12)))
 
