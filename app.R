@@ -10,6 +10,8 @@ box::use(
     ],
     dplyr[filter, mutate],
 
+    ./logics/geo[load_ph_regions],
+    ./logics/regions_meta[REGIONS_META],
     ./logics/data_simulation[simulate_dengue_data],
     ./logics/modeling[classify_risk],
 
@@ -23,6 +25,7 @@ box::use(
 )
 
 SIM_DATA = simulate_dengue_data(seed = 123)
+PH_REGIONS = load_ph_regions()
 
 # ---- UI ----
 ui = page_navbar(
@@ -43,7 +46,12 @@ ui = page_navbar(
     inverse = TRUE,
     collapsible = TRUE,
     header = tags$head(
-        tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+        tags$link(
+            rel = "stylesheet",
+            type = "text/css",
+            href = "styles.css"
+        ),
+        tags$script(src = "map-drag.js")
     ),
     footer = tags$div(
         class = "app-footer",
@@ -132,7 +140,12 @@ server = function(input, output, session) {
     ## ---- Server modules wire-ups ----
 
     ### ---- "Map" server ----
-    map_filters = map$map_server("map", region_ts = region_ts)
+    map_filters = map$map_server(
+        "map",
+        region_ts = region_ts,
+        ph_regions = PH_REGIONS,
+        regions_meta = REGIONS_META
+    )
     ### ---- "Trends" server ----
     trends$trends_server("trends", national_ts = national_ts, region_ts = region_ts)
     ### ---- "Risk" server ----
