@@ -149,7 +149,7 @@
 
 /* ── Map: floating metric filter panel (top-right) ───────────────────────── */
 .map-filter-panel .shiny-input-container {
-    position: absolute;
+    position: fixed;
     top: 10px;
     right: 10px;
     z-index: 1000;
@@ -159,6 +159,7 @@
     padding: 10px 14px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
     width: auto !important;
+    cursor: move;
 }
 
 .map-filter-title {
@@ -202,4 +203,9 @@
 .map-timeline .irs--shiny .irs-to,
 .map-timeline .irs--shiny .irs-single {
     background: #1b3a5c;
+}
+
+/* ── For zooming effect ───────────────────────────────── */
+.girafe_container_std {
+    touch-action: none;
 }
