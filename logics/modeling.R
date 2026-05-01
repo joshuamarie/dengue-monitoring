@@ -4,8 +4,12 @@ box::use(
     utils[tail]
 )
 
-# Fit lagged regression on national yearly data
-# Cases ~ rainfall_index(t-1) + temp_anomaly(t)
+#' Lagged regression on national yearly data
+#'
+#' This function fits a lagged regression based on:
+#' Cases ~ rainfall_index(t-1) + temp_anomaly(t)
+#'
+#' @export
 fit_lag_model = function(national_ts) {
     df = national_ts |>
         mutate(lag1_rain = lag(rainfall_index, 1)) |>
@@ -15,6 +19,9 @@ fit_lag_model = function(national_ts) {
     list(model = model, data = df)
 }
 
+#' Forecast by `n_years` horizon
+#'
+#' @export
 predict_next_years = function(model_obj, n_years = 2) {
     df = model_obj$data
     model = model_obj$model
@@ -35,7 +42,12 @@ predict_next_years = function(model_obj, n_years = 2) {
         )
 }
 
-# Risk classification based on incidence rate per 100,000
+#' Risk classification
+#'
+#' A helper function that helps to classify risks
+#' based on incidence rate per 100,000
+#'
+#' @export
 classify_risk = function(incidence_rate, thresholds = c(low = 30, medium = 80)) {
     dplyr::case_when(
         incidence_rate <= thresholds["low"] ~ "Low",
@@ -44,14 +56,27 @@ classify_risk = function(incidence_rate, thresholds = c(low = 30, medium = 80)) 
     )
 }
 
-# Key metrics from national time series
+#' Metrics Calculation function
+#'
+#' This functions obtains the metrics from national time series
+#'
+#' @export
 compute_metrics = function(national_ts) {
     n = nrow(national_ts)
-    recent = tail(national_ts, 1)
-    prev = national_ts[n - 1, ]
 
-    growth = if (!is.na(prev$cases) && prev$cases > 0) {
-        round((recent$cases - prev$cases) / prev$cases * 100, 1)
+    if (n == 0) return(list(
+        latest_year = NA, latest_cases = NA, growth_pct = NA,
+        peak_year = NA, peak_cases = NA, total_all_years = NA
+    ))
+
+    recent = tail(national_ts, 1)
+
+    growth = if (n >= 2) {
+        prev = national_ts[n - 1, ]
+        if (!is.na(prev$cases) && prev$cases > 0)
+            round((recent$cases - prev$cases) / prev$cases * 100, 1)
+        else
+            NA
     } else {
         NA
     }
