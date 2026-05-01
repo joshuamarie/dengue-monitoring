@@ -1,120 +1,155 @@
 box::use(
-    # ---- Essential namespaces ----
     shiny[
-        fluidPage, tags, tabsetPanel, tabPanel, br,
-        div, span, p, reactive, shinyApp, HTML
+        tags, div, span, p, reactive, shinyApp, HTML, icon
+    ],
+    bslib[
+        page_navbar, nav_panel, nav_spacer, nav_item,
+        sidebar, layout_sidebar, input_dark_mode,
+        card, card_header, card_body,
+        layout_columns
     ],
     dplyr[filter, mutate],
 
-    # ---- Data and modelling ----
     ./logics/data_simulation[simulate_dengue_data],
     ./logics/modeling[classify_risk],
 
-    # ---- Main Shiny interface logics ----
     ./logics/shiny_main/map,
     ./logics/shiny_main/trends,
     ./logics/shiny_main/risk,
     ./logics/shiny_main/metrics,
+    ./logics/shiny_main/about,
+
+    ./themes/app[app_theme]
 )
 
+SIM_DATA = simulate_dengue_data(seed = 123)
 
-SIM_DATA = simulate_dengue_data()
+# ---- UI ----
+ui = page_navbar(
+    title = tags$span(
+        tags$span("🦟", style = "margin-right:8px;"),
+        tags$span(
+            "Dengue Early Warning & Surveillance System",
+            class = "app-title"
+        ),
+        tags$span(
+            tags$span(class = "badge-live", "LIVE"),
+            style = "margin-left: 12px;"
+        )
+    ),
+    theme = app_theme,
+    id = "main_tabs",
+    bg = "#0d1b2a",
+    inverse = TRUE,
+    collapsible = TRUE,
+    header = tags$head(
+        tags$link(rel = "stylesheet", type = "text/css", href = "styles.css")
+    ),
+    footer = tags$div(
+        class = "app-footer",
+        "Built with R Shiny + bslib  |  Modular architecture  |  Epidemiological modeling  |  Philippines Dengue Surveillance Demo"
+    ),
 
-ui = fluidPage(
-    tags$head(
-        tags$title("Dengue Surveillance | Philippines"),
-        tags$link(
-            rel = "stylesheet",
-            type = "text/css",
-            href = "styles.css"
+    ### ---- Tab 1: Map ----
+    nav_panel(
+        title = tags$span(icon("map"), " Overview"),
+        value = "map_tab",
+        layout_sidebar(
+            fillable = TRUE,
+            sidebar = sidebar(
+                width = 340,
+                open = "always",
+                metrics$metrics_ui("metrics_sidebar")
+            ),
+            map$map_ui("map")
         )
     ),
 
-    # ---- Navigation bar ----
-    div(
-        class = "top-nav",
-        span("🦟"),
+    ### ---- Tab 2: Trends ----
+    nav_panel(
+        title = tags$span(icon("chart-line"), " Trends"),
+        value = "trends_tab",
         div(
-            p("Dengue Early Warning & Surveillance System", class = "app-title"),
-            p("Philippines  |  All Regions  |  2018-2025  |  Simulated Data", class = "app-subtitle")
-        ),
-        span(class = "badge-live", "LIVE")
-    ),
-
-    # ---- Main content ----
-    div(
-        class = "main-content",
-        ## ---- Tabset ----
-        tabsetPanel(
-            id = "main_tabs",
-
-            ### ---- Tab 1: Map ----
-            tabPanel(
-                "Map",
-                br(),
-                div(
-                    class = "module-card",
-                    map$map_ui("map")
-                )
-            ),
-
-            ### ---- Tab 2: Trends ----
-            tabPanel(
-                "Trends",
-                br(),
-                div(
-                    class = "module-card",
-                    trends$trends_ui("trends")
-                )
-            ),
-
-            ### ---- Tab 3: Risk Prediction ----
-            tabPanel(
-                "Risk",
-                br(),
-                div(
-                    class = "module-card",
-                    risk$risk_ui("risk")
-                )
-            ),
-
-            ### ---- Tab 4: Metrics ----
-            tabPanel(
-                "Metrics",
-                br(),
-                div(
-                    class = "module-card",
-                    metrics$metrics_ui("metrics")
-                )
+            class = "main-content",
+            card(
+                full_screen = TRUE,
+                card_header(class = "module-card-header", "Epidemiological Trends"),
+                card_body(trends$trends_ui("trends"))
             )
-        ),
-
-        div(
-            class = "app-footer",
-            "Built with R Shiny  |  Modular architecture  |  Epidemiological modeling  |  Philippines Dengue Surveillance Demo"
         )
+    ),
+
+    ### ---- Tab 3: Risk ----
+    nav_panel(
+        title = tags$span(icon("triangle-exclamation"), " Risk"),
+        value = "risk_tab",
+        div(
+            class = "main-content",
+            card(
+                full_screen = TRUE,
+                card_header(class = "module-card-header", "Risk Prediction"),
+                card_body(risk$risk_ui("risk"))
+            )
+        )
+    ),
+
+    ### ---- Tab 4: Metrics ----
+    nav_panel(
+        title = tags$span(icon("table-cells"), " Metrics"),
+        value = "metrics_tab",
+        div(
+            class = "main-content",
+            metrics$metrics_detail_ui("metrics_detail")
+        )
+    ),
+
+    ### ---- Tab 5: About ----
+    nav_panel(
+        title = tags$span(icon("circle-info"), " About"),
+        value = "about_tab",
+        about$about_ui("about")
+    ),
+
+    ## ---- Right side: dark mode toggle ----
+    nav_spacer(),
+    nav_item(
+        tags$span(
+            class = "app-subtitle d-none d-md-inline",
+            "Philippines  |  All Regions  |  2018–2025",
+            style = "margin-right: 12px; opacity: 0.7; font-size: 0.78rem;"
+        )
+    ),
+    nav_item(
+        input_dark_mode(id = "color_mode", mode = "light")
     )
 )
 
+# ---- Server ----
 server = function(input, output, session) {
-    national_ts = reactive({
-        SIM_DATA$national
-    })
+    national_ts = reactive({ SIM_DATA$national })
+    region_ts = reactive({ SIM_DATA$regional })
 
-    region_ts = reactive({
-        SIM_DATA$regional
-    })
+    ## ---- Server modules wire-ups ----
 
-    # ---- Server modules wire ups ----
-
-    ## ---- "Map" server ----
-    map$map_server("map", region_ts = region_ts)
-    ## ---- "Trends server ----
+    ### ---- "Map" server ----
+    map_filters = map$map_server("map", region_ts = region_ts)
+    ### ---- "Trends" server ----
     trends$trends_server("trends", national_ts = national_ts, region_ts = region_ts)
-    ## ---- "Risk" server ----
+    ### ---- "Risk" server ----
     risk$risk_server("risk", national_ts = national_ts)
-    ## ---- "Metrics" server ----
-    metrics$metrics_server("metrics", national_ts = national_ts, region_ts = region_ts)
+    ### ---- "Metrics" server ----
+    metrics$metrics_server(
+        "metrics_sidebar",
+        national_ts = national_ts,
+        region_ts = region_ts,
+        year_range = map_filters$year_range
+    )
+    metrics$metrics_server(
+        "metrics_detail",
+        national_ts = national_ts,
+        region_ts = region_ts,
+        year_range = NULL
+    )
 }
 
 shinyApp(ui, server)
