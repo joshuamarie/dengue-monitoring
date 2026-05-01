@@ -1,5 +1,8 @@
 box::use(
-    shiny[NS, tagList, div, h4, p, selectInput, moduleServer],
+    shiny[
+        NS, tagList, div, h4, p, span, tags, reactive,
+        radioButtons, sliderInput, moduleServer
+    ],
     leaflet[
         leaflet, addProviderTiles, providers, setView,
         addCircleMarkers, addLegend, colorFactor, leafletOutput,
@@ -9,6 +12,7 @@ box::use(
     ../modeling[classify_risk]
 )
 
+# ---- UI ----
 map_ui = function(id) {
     ns = NS(id)
     tagList(
@@ -21,28 +25,45 @@ map_ui = function(id) {
             )
         ),
         div(
-            class = "control-row",
-            selectInput(
-                ns("year"),
-                "Year:",
-                choices = 2018:2025,
-                selected = 2025,
-                width = "140px"
+            style = "position: relative;",
+
+            ### ---- Floating metric panel (top-right) ----
+            div(
+                class = "map-filter-panel",
+                radioButtons(
+                    ns("metric"),
+                    label = NULL,
+                    choices = c(
+                        "Case Count" = "cases",
+                        "Incidence Rate (per 100,000)" = "incidence_rate"
+                    ),
+                    selected = "cases"
+                )
             ),
-            selectInput(
-                ns("metric"),
-                "Display metric:",
-                choices = c(
-                    "Case Count" = "cases",
-                    "Incidence Rate (per 100,000)" = "incidence_rate"
-                ),
-                width = "280px"
+
+            ### ---- Map ----
+            leafletOutput(ns("map"), height = "500px"),
+
+            ### ---- Year timeline (below map) ----
+            div(
+                class = "map-timeline",
+                sliderInput(
+                    ns("year"),
+                    label = NULL,
+                    min = 2018,
+                    max = 2025,
+                    value = c(2018, 2025),
+                    step = 1,
+                    sep = "",
+                    ticks = TRUE,
+                    width = "100%"
+                )
             )
-        ),
-        leafletOutput(ns("map"), height = "480px")
+        )
     )
 }
 
+# ---- Server ----
 map_server = function(id, region_ts) {
     moduleServer(id, function(input, output, session) {
 
@@ -53,7 +74,7 @@ map_server = function(id, region_ts) {
 
         output$map = renderLeaflet({
             df = region_ts() |>
-                keep_when(year == as.integer(input$year)) |>
+                keep_when(year >= input$year[1] & year <= input$year[2]) |>
                 mutate(risk = classify_risk(incidence_rate))
 
             vals = df[[input$metric]]
@@ -86,5 +107,10 @@ map_server = function(id, region_ts) {
                     opacity = 0.9
                 )
         })
+
+        ## ---- Return year_range so other modules can react to it ----
+        list(
+            year_range = reactive({ input$year })
+        )
     })
 }
