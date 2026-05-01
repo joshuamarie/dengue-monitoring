@@ -28,10 +28,13 @@ jobs:
                 "tidyverse", "scales",
 
                 # Shiny framework suite
-                "shiny", "leaflet", "bslib",
+                "shiny", "leaflet", "bslib", ggiraph,
 
                 # Deployment
                 "rsconnect",
+
+                # Geodata
+                rnaturalearth, rnaturalearthhires,
 
                 # Miscellaneous
                 "zoo"
