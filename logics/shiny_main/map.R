@@ -76,8 +76,6 @@ map_server = function(id, region_ts, ph_regions, regions_meta) {
 
         ## ---- Aggregate region_ts over selected year range ----
         map_df = reactive({
-            yr = input$year
-            metric = input$metric
             region_ts() |>
                 keep_when(year >= input$year[1], year <= input$year[2]) |>
                 group_by(region_code, region_name) |>
@@ -154,7 +152,7 @@ map_server = function(id, region_ts, ph_regions, regions_meta) {
                     ),
                     opts_toolbar(
                         saveaspng = FALSE,
-                        hidden = c("selection", "zoom_rect")
+                        hidden = c("zoom_rect", "zoom_reset")
                     ),
                     opts_sizing(rescale = TRUE, width = 1),
                     opts_zoom(min = 1, max = 5)
