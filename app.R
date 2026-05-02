@@ -42,9 +42,14 @@ ui = page_navbar(
     ),
     theme = app_theme,
     id = "main_tabs",
-    bg = "#0d1b2a",
-    inverse = TRUE,
-    collapsible = TRUE,
+    # bg = "#0d1b2a",
+    # inverse = TRUE,
+    # collapsible = TRUE,
+    navbar_options = bslib::navbar_options(
+        bg = "#0d1b2a",
+        underline = TRUE,
+        collapsible = TRUE
+    ),
     header = tags$head(
         tags$link(
             rel = "stylesheet",
