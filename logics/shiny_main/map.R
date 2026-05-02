@@ -16,7 +16,8 @@ box::use(
         girafeOutput, renderGirafe
     ],
     scales[label_comma],
-    stats[median]
+    stats[median],
+    mp = ./plots/map
 )
 
 # ---- UI ----
@@ -39,12 +40,13 @@ map_ui = function(id) {
                 class = "map-filter-panel",
                 radioButtons(
                     ns("metric"),
-                    label = NULL,
+                    label = "Metric:",
                     choices = c(
-                        "Case Count"                  = "cases",
+                        "Case Count"                   = "cases",
                         "Incidence Rate (per 100,000)" = "incidence_rate"
                     ),
-                    selected = "cases"
+                    selected = "cases",
+                    inline = FALSE
                 )
             ),
 
@@ -100,64 +102,7 @@ map_server = function(id, region_ts, ph_regions, regions_meta) {
 
         ## ---- Render ggiraph map ----
         output$map = renderGirafe({
-            df = map_df()
-            metric = input$metric
-            label = if (metric == "cases") "Cases" else "Incidence\n(per 100k)"
-            fmt_val = if (metric == "cases") label_comma() else label_comma(accuracy = 0.01)
-
-            p = ggplot(df) +
-                geom_sf_interactive(
-                    aes(
-                        geometry = geometry,
-                        fill = .data[[metric]],
-                        tooltip = paste0(
-                            "<b style='font-size:1rem;'>", region_name, "</b><br/>",
-                            "<span style='font-size:0.78rem; opacity:0.7;'>",
-                            area_label, "</span><br/>",
-                            areas_html, "<br/><br/>",
-                            "<b>", label, ":</b> ", fmt_val(round(.data[[metric]], 2))
-                        ),
-                        data_id = region_code
-                    ),
-                    color = "#ffffff",
-                    linewidth = 0.4
-                ) +
-                scale_fill_gradient2(
-                    low = "#2dc653",
-                    mid = "#f4a11d",
-                    high = "#e5383b",
-                    midpoint = median(df[[metric]], na.rm = TRUE),
-                    name = label,
-                    labels = fmt_val
-                ) +
-                coord_sf(expand = FALSE, clip = "on") +
-                theme_void() +
-                theme(
-                    legend.position = "right",
-                    legend.title = element_text(size = 9),
-                    legend.text = element_text(size = 8),
-                    plot.background = element_rect(fill = "transparent", color = NA),
-                    panel.background = element_rect(fill = "transparent", color = NA)
-                ) +
-                labs(title = NULL)
-
-            girafe(
-                ggobj = p,
-                options = list(
-                    opts_hover(
-                        css = "fill-opacity:1; stroke:#ffffff; stroke-width:2px;"
-                    ),
-                    opts_hover_inv(
-                        css = "fill-opacity:0.25;"
-                    ),
-                    opts_toolbar(
-                        saveaspng = FALSE,
-                        hidden = c("zoom_rect", "zoom_reset")
-                    ),
-                    opts_sizing(rescale = TRUE, width = 1),
-                    opts_zoom(min = 1, max = 5)
-                )
-            )
+            mp$regional_map(map_df(), input$metric)
         })
 
         ## ---- Return year_range for other modules ----
