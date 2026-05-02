@@ -72,19 +72,29 @@ simulate_dengue_data =
         national_ts = tibble(
             year = years,
             rainfall_index = round(national_rain_index + rnorm(n_years, 0, 0.05), 3),
-            temp_anomaly_c = round(temp_anomaly + rnorm(n_years, 0, 0.05), 2),
-            cases = as.integer(
-                pmax(
-                    0,
-                    round(
-                        70000 *
-                            national_rain_index *
-                            (1 + 0.15 * temp_anomaly) +
-                            rnorm(n_years, 0, 5000)
-                    )
-                )
-            )
+            temp_anomaly_c = round(temp_anomaly + rnorm(n_years, 0, 0.05), 2)
+        ) |> mutate(
+            cases = as.integer(pmax(0, round(
+                70000 * rainfall_index * (1 + 0.15 * temp_anomaly_c) +
+                    rnorm(n_years, 0, 5000)
+            )))
         )
+        # national_ts = tibble(
+        #     year = years,
+        #     rainfall_index = round(national_rain_index + rnorm(n_years, 0, 0.05), 3),
+        #     temp_anomaly_c = round(temp_anomaly + rnorm(n_years, 0, 0.05), 2),
+        #     cases = as.integer(
+        #         pmax(
+        #             0,
+        #             round(
+        #                 70000 *
+        #                     national_rain_index *
+        #                     (1 + 0.15 * temp_anomaly) +
+        #                     rnorm(n_years, 0, 5000)
+        #             )
+        #         )
+        #     )
+        # )
 
         # Per year region breakdown
         region_rows = lapply(seq_len(n_years), function(i) {
