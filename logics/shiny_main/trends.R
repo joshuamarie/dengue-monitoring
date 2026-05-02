@@ -1,16 +1,10 @@
 box::use(
     shiny[
         NS, tagList, div, h4, p, icon, strong, selectInput,
-        checkboxInput, plotOutput, textOutput, moduleServer,
-        reactive, renderPlot, renderText
+        plotOutput, textOutput, moduleServer,
+        renderPlot, renderText, conditionalPanel
     ],
-    ggplot2[
-        ggplot, aes, geom_col, geom_line, geom_point, geom_area,
-        scale_y_continuous, scale_x_continuous, scale_color_manual,
-        scale_fill_manual, facet_wrap, labs, theme_minimal, theme,
-        element_blank, element_text, sec_axis
-    ],
-    dplyr[filter, mutate, group_by, summarise],
+    tp = ./plots/trend
 )
 
 trends_ui = function(id) {
@@ -31,10 +25,14 @@ trends_ui = function(id) {
                 ),
                 width = "200px"
             ),
-            selectInput(
-                ns("region"), "Region (regional view):",
-                choices = NULL,
-                width = "260px"
+            conditionalPanel(
+                condition = "input.view == 'regional'",
+                ns = ns,
+                selectInput(
+                    ns("region"), "Region (regional view):",
+                    choices = NULL,
+                    width = "260px"
+                )
             )
         ),
         plotOutput(ns("trend_plot"), height = "360px"),
@@ -57,76 +55,11 @@ trends_server = function(id, national_ts, region_ts) {
         })
 
         output$trend_plot = renderPlot({
-            if (input$view == "national") {
-                df = national_ts()
-                scale_f = max(df$cases) / max(df$rainfall_index)
-
-                ggplot(df, aes(x = year)) +
-                    geom_area(
-                        aes(y = rainfall_index * scale_f),
-                        fill = "#90caf9",
-                        alpha = 0.4
-                    ) +
-                    geom_line(
-                        aes(y = cases),
-                        color = "#e5383b",
-                        linewidth = 1.2
-                    ) +
-                    geom_point(aes(y = cases), color = "#e5383b", size = 3) +
-                    scale_y_continuous(
-                        name = "Total Cases",
-                        labels = scales::comma,
-                        sec.axis = sec_axis(~ . / scale_f, name = "Rainfall Index")
-                    ) +
-                    scale_x_continuous(breaks = 2018:2025) +
-                    labs(
-                        x = NULL,
-                        caption = "Blue area = rainfall index  |  Red line = national dengue cases"
-                    ) +
-                    theme_minimal(base_size = 13) +
-                    theme(
-                        panel.grid.minor = element_blank(),
-                        axis.title.y = element_text(color = "#e5383b"),
-                        axis.title.y.right = element_text(color = "#1565c0"),
-                        plot.caption = element_text(color = "grey55", size = 10)
-                    )
-            } else {
-                df = region_ts() |>
-                    filter(region_name == input$region)
-
-                ggplot(df, aes(x = year, y = cases)) +
-                    geom_col(fill = "#1b3a5c", alpha = 0.8, width = 0.6) +
-                    geom_line(
-                        aes(y = incidence_rate * max(cases) / max(incidence_rate)),
-                        color = "#e5383b",
-                        linewidth = 1.1
-                    ) +
-                    geom_point(
-                        aes(y = incidence_rate * max(cases) / max(incidence_rate)),
-                        color = "#e5383b",
-                        size = 2.5
-                    ) +
-                    scale_y_continuous(
-                        name = "Cases",
-                        labels = scales::comma,
-                        sec.axis = sec_axis(
-                            \(x) x * max(df$incidence_rate) / max(df$cases),
-                            name = "Incidence (per 100,000)"
-                        )
-                    ) +
-                    scale_x_continuous(breaks = 2018:2025) +
-                    labs(
-                        x = NULL,
-                        caption = "Bars = case count  |  Red line = incidence rate per 100,000"
-                    ) +
-                    theme_minimal(base_size = 13) +
-                    theme(
-                        panel.grid.minor = element_blank(),
-                        axis.title.y = element_text(color = "#1b3a5c"),
-                        axis.title.y.right = element_text(color = "#e5383b"),
-                        plot.caption = element_text(color = "grey55", size = 10)
-                    )
-            }
+            switch(
+                input$view,
+                "national" = tp$national_plot(national_ts()),
+                "regional" = tp$regional_plot(region_ts(), input$region)
+            )
         }, res = 110)
 
         output$interp = renderText({
