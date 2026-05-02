@@ -3,7 +3,7 @@ box::use(
         ggplot, aes, geom_ribbon, geom_line, geom_vline,
         scale_color_manual, scale_x_continuous,
         scale_y_continuous, labs, theme_minimal, theme,
-        element_blank, element_text
+        element_blank, element_text, element_line, arrow, unit
     ],
     ggiraph[
         geom_point_interactive, geom_line_interactive, girafe,
@@ -31,17 +31,22 @@ forecast_plot = function(df, year) {
         geom_line_interactive(
             data = obs,
             aes(tooltip = type, data_id = type),
-            linewidth = 1.15
+            linewidth = 1.35
         ) +
         geom_line_interactive(
             data = fcast,
             aes(tooltip = type, data_id = type),
-            linewidth = 1.15
+            linewidth = 1.35
         ) +
-        geom_line(
+        geom_line_interactive(
             data = connector,
-            aes(x = year, y = predicted),
-            color = "#1565c0",
+            aes(
+                x = year,
+                y = predicted,
+                tooltip = "Observed",
+                data_id = "Observed"
+            ),
+            color = "#2C3E50",
             linewidth = 1.15,
             inherit.aes = FALSE
         ) +
@@ -51,7 +56,7 @@ forecast_plot = function(df, year) {
                 tooltip = f_string("Year: {year}\nCases: {scales::comma(predicted)}"),
                 data_id = type
             ),
-            size = 2.8
+            size = 3.5
         ) +
         geom_point_interactive(
             data = fcast,
@@ -67,12 +72,12 @@ forecast_plot = function(df, year) {
             color = "grey50"
         ) +
         scale_color_manual(
-            values = c("Observed" = "#1565c0", "Forecast" = "#e65100")
+            values = c("Observed" = "#2C3E50", "Forecast" = "#e65100")
         ) +
         scale_x_continuous(breaks = seq(min(df$year), max(year))) +
         scale_y_continuous(labels = scales::comma) +
         labs(
-            x = NULL,
+            x = "",
             y = "Cases",
             color = NULL,
             caption = "Shaded band = 95% prediction interval"
@@ -80,6 +85,15 @@ forecast_plot = function(df, year) {
         theme_minimal(base_size = 13) +
         theme(
             panel.grid.minor = element_blank(),
+            panel.grid.major.x = element_blank(),
+            axis.line.x = element_line(
+                arrow = arrow(
+                    length = unit(0.09, "inches"),
+                    type = "closed"
+                )
+            ),
+            axis.title.y = element_text(size = 13, color = "#2C3E50"),
+            axis.line.y = element_line(),
             legend.position = "none",
             plot.caption = element_text(color = "grey55", size = 10)
         )
