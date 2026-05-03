@@ -37,7 +37,7 @@ jobs:
                 "tidyverse", "scales",
 
                 # Shiny framework suite
-                "shiny", "leaflet", "bslib", "ggiraph",
+                "shiny", "leaflet", "bslib", "ggiraph", "DT",
 
                 # Deployment
                 "rsconnect",
