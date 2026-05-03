@@ -46,7 +46,7 @@ jobs:
                 "rnaturalearth", "rnaturalearthhires",
 
                 # Miscellaneous
-                "zoo"
+                "zoo", "gt", "broom"
             ))
         shell: Rscript {0}
 
