@@ -187,3 +187,8 @@
 .girafe_container_std {
     touch-action: none;
 }
+
+/* ── For DT style ───────────────────────────────── */
+.noVis {
+    display: revert !important;
+}
