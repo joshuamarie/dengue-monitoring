@@ -33,8 +33,24 @@ The one-year lag on rainfall reflects the biological lifecycle of *Aedes aegypti
 
 ## Prerequisites
 
+Here are the setups I used
+
 - R >= 4.3
 - The `{box}` package (`install.packages("box")`)
+- The `{tidyverse}` suite
+- Shiny framework suite: 
+
+    - `{shiny}`
+    - `{bslib}`
+    - `{ggiraph}`
+    - `{DT}`
+
+- Deployment: `{rsconnect}`
+- Geodata: `{rnaturalearth}` & `{rnaturalearthhires}`
+- Other convenient packages:
+
+    - `{broom}`
+    - `{gt}
 
 ## Deployment
 
