@@ -9,7 +9,8 @@ box::use(
     ],
     dplyr[bind_rows, mutate, rename, select],
     fp = ./plots/forecast,
-    ../modeling[fit_lag_model, predict_next_years, classify_risk]
+    ../modeling[fit_lag_model, predict_next_years, classify_risk],
+    rr = ./info/render_risk
 )
 
 # ---- UI ----
@@ -35,7 +36,9 @@ risk_ui = function(id) {
                 width = "300px"
             )
         ),
-        ggiraph::girafeOutput(ns("forecast_plot"), height = "500px", width = "100%"),
+        ggiraph::girafeOutput(ns("forecast_plot"), width = "100%"),
+        br(),
+        gt::gt_output(ns("stat_out")),
         br(),
         uiOutput(ns("risk_cards")),
         br(),
@@ -73,6 +76,8 @@ risk_server = function(id, national_ts) {
             fp$forecast_plot(df, fcast$year)
 
         })
+
+        output$stat_out = rr$statistical_output(model_obj()$model)
 
         output$risk_cards = renderUI({
             fcast = forecast_df()
