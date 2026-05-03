@@ -4,19 +4,7 @@ box::use(
         radioButtons, sliderInput, moduleServer
     ],
     dplyr[keep_when = filter, group_by, summarise, left_join, mutate, ungroup, rowwise],
-    ggplot2[
-        ggplot, aes, geom_sf, scale_fill_gradient2,
-        theme_void, theme, element_text, element_rect,
-        element_blank, labs, coord_sf
-    ],
-    ggiraph[
-        geom_sf_interactive, girafe, girafe_options,
-        opts_hover, opts_hover_inv, opts_toolbar,
-        opts_sizing, opts_zoom,
-        girafeOutput, renderGirafe
-    ],
-    scales[label_comma],
-    stats[median],
+    ggiraph[girafeOutput, renderGirafe],
     mp = ./plots/map
 )
 
@@ -39,10 +27,10 @@ map_ui = function(id) {
             div(
                 class = "map-filter-panel",
                 radioButtons(
-                    ns("metric"),
+                    ns("metrics"),
                     label = "Metric:",
                     choices = c(
-                        "Case Count"                   = "cases",
+                        "Case Count" = "cases",
                         "Incidence Rate (per 100,000)" = "incidence_rate"
                     ),
                     selected = "cases",
@@ -51,7 +39,7 @@ map_ui = function(id) {
             ),
 
             ### ---- Map ----
-            girafeOutput(ns("map"), height = "500px"),
+            girafeOutput(ns("mapping"), height = "500px"),
 
             ### ---- Year slider ----
             div(
@@ -79,11 +67,11 @@ map_server = function(id, region_ts, ph_regions, regions_meta) {
         ## ---- Aggregate region_ts over selected year range ----
         map_df = reactive({
             region_ts() |>
-                keep_when(year >= input$year[1], year <= input$year[2]) |>
-                group_by(region_code, region_name) |>
+                keep_when(.data$year >= input$year[1], .data$year <= input$year[2]) |>
+                group_by(.data$region_code, .data$region_name) |>
                 summarise(
-                    cases = sum(cases, na.rm = TRUE),
-                    population = mean(population, na.rm = TRUE),
+                    cases = sum(.data$cases, na.rm = TRUE),
+                    population = mean(.data$population, na.rm = TRUE),
                     .groups = "drop"
                 ) |>
                 mutate(
@@ -100,12 +88,13 @@ map_server = function(id, region_ts, ph_regions, regions_meta) {
                 ungroup()
         })
 
-        ## ---- Render ggiraph map ----
-        output$map = renderGirafe({
-            mp$regional_map(map_df(), input$metric)
+        ## ---- ggiraph map ----
+        ## Call `regional_map()` from the imported
+        ## `./plots/map` as `mp`
+        output$mapping = renderGirafe({
+            mp$regional_map(map_df(), input$metrics)
         })
 
-        ## ---- Return year_range for other modules ----
         list(year_range = reactive({ input$year }))
     })
 }
