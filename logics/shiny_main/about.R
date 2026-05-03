@@ -1,5 +1,5 @@
 box::use(
-    shiny[NS, tagList, div, icon, tags, HTML, moduleServer],
+    shiny[NS, tagList, div, icon, tags, HTML, moduleServer, withMathJax],
     bslib[card, card_header, card_body],
 )
 
@@ -8,6 +8,7 @@ about_ui = function(id) {
     ns = NS(id)
     div(
         class = "main-content",
+        withMathJax(),
         card(
             card_header(class = "module-card-header", "About this app"),
             card_body(
@@ -15,12 +16,23 @@ about_ui = function(id) {
                     class = "lead",
                     "A modular R Shiny application for dengue outbreak monitoring across all 17 Philippine regions, covering 2018–2025."
                 ),
-                tags$hr(),
                 tags$h5("Modelling approach"),
+                tags$p(
+                    "A lagged OLS regression model is fitted on the national yearly time series:"
+                ),
+                tags$p(
+                    class = "text-center my-3",
+                    HTML("$$\\hat{y}_t = \\beta_0 + \\beta_1 x_{1,\\, t-1} + \\beta_2 x_{2,\\, t} + \\varepsilon_t$$")
+                ),
+                tags$ul(
+                    tags$li(HTML("\\(\\hat{y}_t\\): predicted dengue cases at year \\(t\\)")),
+                    tags$li(HTML("\\(x_{1,\\, t-1}\\): rainfall index lagged by one year")),
+                    tags$li(HTML("\\(x_{2,\\, t}\\): temperature anomaly (°C) at year \\(t\\)")),
+                    tags$li(HTML("\\(\\beta_0, \\beta_1, \\beta_2\\): estimated coefficients")),
+                    tags$li(HTML("\\(\\varepsilon_t\\): error term"))
+                ),
                 tags$p(HTML(
-                    "A lagged OLS regression model is fitted on the national yearly time series:<br><br>
-                    <code>ŷ(t) = β₀ + β₁ · rainfall(t−1) + β₂ · temp_anomaly(t) + ε</code><br><br>
-                    The one-year lag on rainfall reflects the biological lifecycle of <em>Aedes aegypti</em>:
+                    "The one-year lag on rainfall reflects the biological lifecycle of <em>Aedes aegypti</em>:
                     elevated rainfall expands breeding sites, and the resulting increase in mosquito density
                     translates into elevated case counts in the following transmission season."
                 )),
