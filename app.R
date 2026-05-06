@@ -30,10 +30,17 @@ PH_REGIONS = load_ph_regions()
 # ---- UI ----
 ui = page_navbar(
     title = tags$span(
-        tags$span("🦟", style = "margin-right:8px;"),
+        tags$img(
+            src = "images/doh-logo.jpg",
+            style = "margin-right: 8px; width: 37px; height: 24px; vertical-align: middle;"
+        ),
         tags$span(
             "Dengue Early Warning & Surveillance System",
             class = "app-title"
+        ),
+        tags$img(
+            src = "images/pagasa-logo.png",
+            style = "margin-right: 8px; width: 30px; height: 30px; vertical-align: middle;"
         ),
         tags$span(
             tags$span(class = "badge-live", "LIVE"),
