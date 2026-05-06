@@ -69,17 +69,17 @@ metrics_server = function(id, national_ts, region_ts, year_range = NULL) {
 
         filtered_national_ts = reactive({
             df = national_ts()
-            # y = yr()
-            if (!is.null(yr()) && length(yr()) == 2)
-                df = df |> keep_when(year >= yr()[1] & year <= yr()[2])
+            y = yr()
+            if (!is.null(y) && length(y) == 2)
+                df = df |> keep_when(year >= y[1] & year <= y[2])
             df
         })
 
         filtered_region_ts = reactive({
             df = region_ts()
-            # y = yr()
-            if (!is.null(yr()) && length(yr()) == 2)
-                df = df |> keep_when(year >= yr()[1] & year <= yr()[2])
+            y = yr()
+            if (!is.null(y) && length(y) == 2)
+                df = df |> keep_when(year >= y[1] & year <= y[2])
             df
         })
 
