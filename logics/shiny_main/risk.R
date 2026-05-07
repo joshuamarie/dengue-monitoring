@@ -2,7 +2,7 @@ box::use(
     shiny[
         NS, tagList, div, p, icon, strong, br, tags,
         sliderInput, plotOutput, uiOutput, moduleServer,
-        reactive, renderPlot, renderUI
+        reactive, renderPlot, renderUI, observe
     ],
     bslib[
         layout_columns, value_box
@@ -77,7 +77,9 @@ risk_server = function(id, national_ts) {
 
         })
 
-        output$stat_out = rr$statistical_output(model_obj()$model)
+        observe({
+            output$stat_out = rr$statistical_output(model_obj()$model)
+        })
 
         output$risk_cards = renderUI({
             fcast = forecast_df()
