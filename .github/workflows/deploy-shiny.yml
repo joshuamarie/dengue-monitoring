@@ -43,7 +43,7 @@ jobs:
                 "rsconnect",
 
                 # Geodata
-                "rnaturalearth", "rnaturalearthhires",
+                "sf", "rnaturalearth", "rnaturalearthhires",
 
                 # Miscellaneous
                 "zoo", "gt", "broom"
