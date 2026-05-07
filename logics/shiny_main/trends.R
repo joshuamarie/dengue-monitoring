@@ -2,7 +2,8 @@ box::use(
     shiny[
         NS, tagList, div, h4, p, icon, strong, selectInput,
         plotOutput, textOutput, moduleServer,
-        renderPlot, renderText, conditionalPanel
+        renderPlot, renderText, conditionalPanel,
+        observe, updateSelectInput
     ],
     tp = ./plots/trend
 )
@@ -48,10 +49,11 @@ trends_ui = function(id) {
 trends_server = function(id, national_ts, region_ts) {
     moduleServer(id, function(input, output, session) {
 
-        shiny::observe({
+        observe({
             choices = unique(region_ts()$region_name)
             names(choices) = choices
-            shiny::updateSelectInput(session, "region", choices = choices)
+            # updateSelectInput(session = session, inputId = "region", choices = choices)
+            updateSelectInput(inputId = "region", choices = choices)
         })
 
         output$trend_plot = renderPlot({
