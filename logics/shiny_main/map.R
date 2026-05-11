@@ -95,6 +95,10 @@ map_server = function(id, region_ts, ph_regions, regions_meta) {
             mp$regional_map(map_df(), input$metrics)
         })
 
-        list(year_range = reactive({ input$year }))
+        list(
+            year_range = reactive({ input$year }),
+            metric = reactive({ input$metrics }),
+            hovered = reactive({ input$mapping_hovered })
+        )
     })
 }
