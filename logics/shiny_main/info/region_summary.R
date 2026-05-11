@@ -8,7 +8,7 @@ box::use(
 #' @return A summarised data frame with Region, Cases, Incidence, Risk columns.
 compute_region_summary = function(region_ts_filtered) {
     region_ts_filtered |>
-        group_by(region_name) |>
+        group_by(region_code, region_name) |>
         summarise(
             cases = sum(cases, na.rm = TRUE),
             incidence_rate = round(
@@ -16,10 +16,12 @@ compute_region_summary = function(region_ts_filtered) {
                     sum(population, na.rm = TRUE) *
                     100000,
                 1
-            )
+            ),
+            .groups = "drop"
         ) |>
         mutate(risk = classify_risk(incidence_rate)) |>
         select(
+            region_code,
             Region = region_name,
             Cases = cases,
             `Incidence (per 100,000)` = incidence_rate,
