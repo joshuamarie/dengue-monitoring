@@ -167,7 +167,9 @@ server = function(input, output, session) {
         "metrics_sidebar",
         national_ts = national_ts,
         region_ts = region_ts,
-        year_range = map_filters$year_range
+        year_range = map_filters$year_range,
+        metric = map_filters$metric,
+        hovered = map_filters$hovered
     )
     metrics$metrics_server(
         "metrics_detail",
