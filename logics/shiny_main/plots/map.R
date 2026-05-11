@@ -56,7 +56,10 @@ regional_map = function(df, metric) {
     girafe(
         ggobj = p,
         options = list(
-            opts_hover(css = "fill-opacity:1; stroke:#ffffff; stroke-width:2px;"),
+            opts_hover(
+                css = "fill-opacity:1; stroke:#ffffff; stroke-width:2px;",
+                reactive = TRUE
+            ),
             opts_hover_inv(css = "fill-opacity:0.25;"),
             opts_toolbar(saveaspng = FALSE, hidden = c("zoom_rect", "zoom_reset")),
             opts_sizing(rescale = TRUE, width = 1),
