@@ -31,7 +31,7 @@ metrics_ui = function(id) {
             icon("table"), " Regional Summary (latest year)",
             class = "sidebar-section-title"
         ),
-        uiOutput(ns("region_table_compact"))
+        DTOutput(ns("region_table_compact"))
     )
 }
 
@@ -61,7 +61,7 @@ metrics_detail_ui = function(id) {
 }
 
 # ---- Shared server ----
-metrics_server = function(id, national_ts, region_ts, year_range = NULL) {
+metrics_server = function(id, national_ts, region_ts, year_range = NULL, metric = NULL, hovered = NULL) {
     moduleServer(id, function(input, output, session) {
         yr = reactive({
             if (!is.null(year_range)) year_range() else input$year_detail
@@ -94,6 +94,6 @@ metrics_server = function(id, national_ts, region_ts, year_range = NULL) {
         })
 
         mt$render_metrics_table(output, filtered_region_ts)
-        mtsb$render_metrics_table_sb(output, filtered_region_ts)
+        mtsb$render_metrics_table_sb(output, session, filtered_region_ts, metric, hovered)
     })
 }
