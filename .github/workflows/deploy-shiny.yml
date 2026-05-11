@@ -27,6 +27,15 @@ jobs:
       #       Sys.setenv("_R_USE_PIPEBIND_" = TRUE)
       #   shell: Rscript {0}
 
+      - name: Install system dependencies
+        run: |
+            sudo apt-get update
+            sudo apt-get install -y \
+                libgdal-dev \
+                libgeos-dev \
+                libproj-dev \
+                libsqlite3-dev
+
       - name: Install necessary R packages
         run: |
             install.packages(c(
