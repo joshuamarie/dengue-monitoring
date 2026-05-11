@@ -192,3 +192,23 @@
 .noVis {
     display: revert !important;
 }
+
+#metrics_sidebar-region_table_compact table.dataTable {
+    font-size: 0.78rem;
+    width: 100% !important;
+    margin: 0 !important;
+}
+
+#metrics_sidebar-region_table_compact thead th {
+    font-size: 0.78rem;
+    font-weight: 700;
+    color: #fff;
+    background-color: #212529;
+    padding: 4px 6px;
+    border-bottom: none;
+}
+
+#metrics_sidebar-region_table_compact tbody td {
+    padding: 4px 6px;
+    vertical-align: middle;
+}
